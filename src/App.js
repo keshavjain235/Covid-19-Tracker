@@ -11,7 +11,7 @@ import 'leaflet/dist/leaflet.css';
 function App() {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState("worldwide");
-  const [countryInfo, setCountryInfo] = useState([]);
+  const [countryInfo, setCountryInfo] = useState({});
   const [tableData, setTableData] = useState([]);
   const [mapCountries, setMapCountries] = useState([]);
   const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
@@ -29,11 +29,11 @@ function App() {
   useEffect(() => {
     const getCountriesData = async () => {
       await fetch("https://disease.sh/v3/covid-19/countries")
-      .then((response) => response.json())
-      .then((data) => {
-        const countries = data.map((country) => ({
+      .then(response => response.json())
+      .then(data => {
+        const countries = data.map(country => ({
           name: country.country,
-          value: country.countryInfo.iso2,
+          value: country.countryInfo.iso2
         }));
 
         const sortedData = sortData(data);
@@ -51,16 +51,16 @@ function App() {
     setCountry(countryCode);
 
     const url = countryCode === 'worldwide' 
-        ? 'https://disease.sh/v3/covid-19/all' 
-        : `https://disease.sh/v3/covid-19/countries/${countryCode}`;
+      ? 'https://disease.sh/v3/covid-19/all' 
+      : `https://disease.sh/v3/covid-19/countries/${countryCode}`;
 
     await fetch(url)
       .then(response => response.json())
       .then(data => {
         setCountry(countryCode);
         setCountryInfo(data);
-        setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
-        setMapZoom(4);
+        setMapCenter(countryCode ==="worldwide" ? {lat: 34.80746, lng: -40.4796} : [data.countryInfo.lat, data.countryInfo.long]);
+        setMapZoom(countryCode === "worldwide" ? 2.5 : 4);
       })
   }
 
@@ -73,10 +73,9 @@ function App() {
           <FormControl className="app-dropdown">
             <Select variant="outlined" value={country} onChange={onCountryChange}>
               <MenuItem value="worldwide">Worldwide</MenuItem>
-              {countries.map((country) => (
+              {countries.map(country => (
                 <MenuItem value={country.value}>{country.name}</MenuItem>
               ))}
-                
             </Select>
           </FormControl>
         </div>
@@ -85,14 +84,14 @@ function App() {
           <InfoBox
             isRed
             active={casesType === "cases"}
-            onClick={e => setCasesType('cases')}
+            onClick={e => setCasesType("cases")}
             title="Coronavirus Cases"
             cases={prettyPrintStat(countryInfo.todayCases)}
             total={prettyPrintStat(countryInfo.cases)} />
           
           <InfoBox
             active={casesType === "recovered"}
-            onClick={e => setCasesType('recovered')}
+            onClick={e => setCasesType("recovered")}
             title="Recovered" 
             cases={prettyPrintStat(countryInfo.todayRecovered)}
             total={prettyPrintStat(countryInfo.recovered)} />
@@ -100,12 +99,11 @@ function App() {
           <InfoBox
             isRed
             active={casesType === "deaths"}
-            onClick={e => setCasesType('deaths')}
+            onClick={e => setCasesType("deaths")}
             title="Deaths"
             cases={prettyPrintStat(countryInfo.todayDeaths)} 
             total={prettyPrintStat(countryInfo.deaths)} />
         </div>
-
 
         <Map casesType={casesType} countries={mapCountries} center={mapCenter} zoom={mapZoom} />
       </div>
@@ -117,8 +115,6 @@ function App() {
           <h3 className="app-graphTitle">Worldwide New {casesType}</h3>
           <LineGraph className="app-graph" casesType={casesType} />
         </CardContent>
-
-
       </Card>
 
     </div>

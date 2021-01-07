@@ -14,7 +14,7 @@ function Table({ countries }) {
                 </tr>
             ))}
         </div>
-    )
+    );
 }
 
 export default Table;

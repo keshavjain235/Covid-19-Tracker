@@ -65,7 +65,7 @@ function LineGraph({ casesType = 'cases', ...props }) {
             lastDataPoint = data[casesType][date];
         }
         return chartData;
-    }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -77,7 +77,7 @@ function LineGraph({ casesType = 'cases', ...props }) {
             });
         }
         fetchData();
-    }, [casesType])
+    }, [casesType]);
 
     return (
         <div className={props.className}>
@@ -96,7 +96,7 @@ function LineGraph({ casesType = 'cases', ...props }) {
                 />
             )}       
         </div>
-    )
+    );
 }
 
 export default LineGraph;
